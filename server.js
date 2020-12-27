@@ -11,7 +11,7 @@ mongoose.connect(mongoConnectionString, { useNewUrlParser: true, useUnifiedTopol
   .catch(fail => console.log('Failed to connect to mongodb: ' + fail));
 
 const userSchema = new mongoose.Schema({
-  userName: { type: String, unique: true, required: true }
+  username: { type: String, unique: true, required: true }
 });
 const UserModel = mongoose.model('User', userSchema);
 
@@ -30,7 +30,7 @@ app.post("/api/exercise/new-user", async (req, res) => {
     res.status(400).end();
   };
   const user = new UserModel({
-    userName: username
+    username: username
   });
 
   user.save()
@@ -39,7 +39,7 @@ app.post("/api/exercise/new-user", async (req, res) => {
       res.json(doc)
     })
     .catch(error => {
-      console.log('Failed to create new user:' + error);
+      console.log('Failed to create new user: ' + error);
       const e = error.code === 11000
         ? { status: 409, message: 'Username already exists' }
         : { status: 500, message: error.message };
@@ -48,6 +48,9 @@ app.post("/api/exercise/new-user", async (req, res) => {
     });
 });
 
+app.get('/api/exercise/users', async (req, res) => {
+  res.json(await UserModel.find());
+});
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
